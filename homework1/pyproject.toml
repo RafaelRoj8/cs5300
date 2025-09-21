@@ -1,0 +1,3 @@
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
