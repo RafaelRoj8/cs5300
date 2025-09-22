@@ -2,6 +2,7 @@ asgiref==3.7.2
 Django==4.2.11
 gyp==0.1
 iniconfig==2.1.0
+numpy==2.3.3
 packaging==25.0
 pluggy==1.6.0
 Pygments==2.19.2
