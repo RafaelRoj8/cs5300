@@ -1,6 +1,6 @@
 # src/task7.py
 
-# We will use the NumPy package to do simple math.
+# This code will use the NumPy package to do simple math.
 import numpy as np  # "np" is the common short name
 
 #Add two lists of numbers, position by position, using NumPy.
