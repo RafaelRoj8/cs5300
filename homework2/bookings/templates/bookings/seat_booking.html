@@ -1,0 +1,34 @@
+{% extends "bookings/base.html" %}
+{% block title %}Book a Seat{% endblock %}
+{% block content %}
+  <h2 class="mb-3">Book a seat for <strong>{{ movie.title }}</strong></h2>
+
+  <!-- If the view set a message (like an error), I show it here -->
+  {% if message %}
+    <div class="alert alert-warning">{{ message }}</div>
+  {% endif %}
+
+  <!-- Basic POST form (CSRF is required in Django forms) -->
+  <form method="post" class="card p-3">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label" for="seat">Seat</label>
+      <!-- I list all seats; booked seats are disabled -->
+      <select id="seat" name="seat" class="form-select" required>
+        <option value="">-- choose a seat --</option>
+        {% for seat in seats %}
+          <option value="{{ seat.id }}" {% if seat.is_booked %}disabled{% endif %}>
+            {{ seat.seat_number }} {% if seat.is_booked %}(booked){% endif %}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="user">Your name</label>
+      <input id="user" name="user" class="form-control" placeholder="e.g. Alice" required>
+    </div>
+
+    <button class="btn btn-primary">Book Seat</button>
+  </form>
+{% endblock %}

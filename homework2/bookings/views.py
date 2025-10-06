@@ -1,10 +1,20 @@
+# homework2/bookings/views.py
+
+# DRF imports for API viewsets and responses
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Django helpers for the simple HTML (template) views
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_http_methods
+
+# my models and serializers
 from .models import Movie, Seat, Booking
 from .serializers import MovieSerializer, SeatSerializer, BookingSerializer
 
+
+# ----------------------------- API (DRF) -----------------------------
 
 # wants full CRUD for movies, so I use a DRF ModelViewSet.
 class MovieViewSet(viewsets.ModelViewSet):
@@ -14,7 +24,7 @@ class MovieViewSet(viewsets.ModelViewSet):
     serializer_class = MovieSerializer
 
 
-# I uses this viewset for seat info and for booking a specific seat.
+# I use this viewset for seat info and for booking a specific seat.
 class SeatViewSet(viewsets.ModelViewSet):
     # I prefetch the related movie so list/detail calls are efficient.
     queryset = Seat.objects.select_related("movie").all().order_by("id")
@@ -58,11 +68,11 @@ class BookingViewSet(viewsets.ModelViewSet):
     # serializes bookings with my BookingSerializer.
     serializer_class = BookingSerializer
 
-    # here it allows filtering by user via ?user=Name to see just that user’s history.
+    # here I allow filtering by user via ?user=Name to see just that user’s history.
     def get_queryset(self):
         # starts with the base queryset.
         qs = super().get_queryset()
-        # this line looks for a user query param and filter if present.
+        # this line looks for a user query param and filters if present.
         user = self.request.query_params.get("user")
         if user:
             qs = qs.filter(user=user)
@@ -97,13 +107,69 @@ class BookingViewSet(viewsets.ModelViewSet):
             return Response({"detail": "seat already booked"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # marks the seats as booked and saves.
+        # marks the seat as booked and saves.
         seat.is_booked = True
         seat.save(update_fields=["is_booked"])
 
-        # I created the booking record.
+        # I create the booking record.
         booking = Booking.objects.create(movie_id=movie_id, seat=seat, user=user)
 
-        # Here it serializes the new booking and returns 201.
+        # serialize the new booking and return 201.
         serializer = self.get_serializer(booking)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# ------------------------- Simple HTML (UI) --------------------------
+
+# I list all movies so I can click into a booking page.
+def movie_list_view(request):
+    movies = Movie.objects.all().order_by("title")
+    return render(request, "bookings/movie_list.html", {"movies": movies})
+
+
+# I show seats for one movie and let the user submit a small booking form.
+@require_http_methods(["GET", "POST"])
+def seat_booking_view(request, movie_id):
+    # fetch the movie (404 if not found)
+    movie = get_object_or_404(Movie, pk=movie_id)
+    # list seats for this movie
+    seats = movie.seats.order_by("seat_number")
+    # message to show simple errors
+    message = None
+
+    if request.method == "POST":
+        # basic form fields
+        seat_id = request.POST.get("seat")
+        user = (request.POST.get("user") or "").strip()
+
+        if not seat_id or not user:
+            message = "Pick a seat and enter your name."
+        else:
+            # make sure the seat exists and belongs to this movie
+            seat = get_object_or_404(Seat, pk=seat_id, movie=movie)
+            if seat.is_booked:
+                message = f"Seat {seat.seat_number} is already booked."
+            else:
+                # mark booked + create booking
+                seat.is_booked = True
+                seat.save(update_fields=["is_booked"])
+                Booking.objects.create(movie=movie, seat=seat, user=user)
+                # go to history page on success
+                return redirect("booking_history")
+
+    return render(
+        request,
+        "bookings/seat_booking.html",
+        {"movie": movie, "seats": seats, "message": message},
+    )
+
+
+# I display booking history (and let myself filter by ?user=Name).
+def booking_history_view(request):
+    # newest first
+    qs = Booking.objects.select_related("movie", "seat").order_by("-booking_date")
+    # optional filter
+    user = (request.GET.get("user") or "").strip()
+    if user:
+        qs = qs.filter(user=user)
+    return render(request, "bookings/booking_history.html", {"bookings": qs, "user": user})
