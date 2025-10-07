@@ -20,6 +20,8 @@ python manage.py runserver 0.0.0.0:3000
 
 -Booking history: https://app-cs4300rr-20.devedu.io/api/ui/history/
 
+-If you use the Editor button, start at /proxy/3000/api/ui/ (use the urls instead)
+
 ## API endpoints
 GET/POST /api/movies/
 GET/POST /api/seats/
