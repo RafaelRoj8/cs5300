@@ -14,9 +14,11 @@ python manage.py runserver 0.0.0.0:3000
 ```
 
 ## Open the App URLs (recommended):
-Movie list:
-Seat booking (example id=1):
-Booking history:
+-Movie list: https://app-cs4300rr-20.devedu.io/api/ui/
+
+-Seat booking (example id=1): https://app-cs4300rr-20.devedu.io/api/ui/movies/1/book/
+
+-Booking history: https://app-cs4300rr-20.devedu.io/api/ui/history/
 
 ## API endpoints
 GET/POST /api/movies/
