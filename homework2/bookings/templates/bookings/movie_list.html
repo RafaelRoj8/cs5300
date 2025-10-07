@@ -1,24 +1,18 @@
 {% extends "bookings/base.html" %}
 {% block title %}Movie List{% endblock %}
-{% block content %}
-  <h2 class="mb-3">Available Movies</h2>
 
-  <!-- I loop through all movies the view sends in "movies" -->
-  <ul class="list-group">
-    {% for movie in movies %}
-      <li class="list-group-item d-flex justify-content-between align-items-start">
-        <div>
-          <h5 class="mb-1">{{ movie.title }}</h5>
-          <div class="text-muted small">
-            {{ movie.release_date }} • {{ movie.duration }} min
-          </div>
-          <p class="mb-1">{{ movie.description|default:"No description." }}</p>
-        </div>
-        <!-- This link takes me to the seat booking page for that movie -->
-        <a class="btn btn-primary" href="{% url 'book_seat' movie.id %}">Book Now</a>
-      </li>
-    {% empty %}
-      <li class="list-group-item">No movies yet.</li>
-    {% endfor %}
-  </ul>
+{% block content %}
+<h2 class="mb-3">Available Movies</h2>
+
+<ul class="list-group">
+  {% for movie in movies %}
+    <li class="list-group-item">
+      <h5 class="mb-1">{{ movie.title }}</h5>
+      <p class="mb-2">{{ movie.description }}</p>
+      <a class="btn btn-primary" href="{% url 'book_seat' movie.id %}">Book Now</a>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No movies yet.</li>
+  {% endfor %}
+</ul>
 {% endblock %}

@@ -1,34 +1,47 @@
 {% extends "bookings/base.html" %}
-{% block title %}Book a Seat{% endblock %}
+{% block title %}Book Seats{% endblock %}
+
 {% block content %}
-  <h2 class="mb-3">Book a seat for <strong>{{ movie.title }}</strong></h2>
+<h2 class="mb-3">Book a seat for: {{ movie.title }}</h2>
 
-  <!-- If the view set a message (like an error), I show it here -->
-  {% if message %}
-    <div class="alert alert-warning">{{ message }}</div>
-  {% endif %}
+{% if message %}
+  <div class="alert alert-danger">{{ message }}</div>
+{% endif %}
 
-  <!-- Basic POST form (CSRF is required in Django forms) -->
-  <form method="post" class="card p-3">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label class="form-label" for="seat">Seat</label>
-      <!-- I list all seats; booked seats are disabled -->
-      <select id="seat" name="seat" class="form-select" required>
-        <option value="">-- choose a seat --</option>
-        {% for seat in seats %}
-          <option value="{{ seat.id }}" {% if seat.is_booked %}disabled{% endif %}>
-            {{ seat.seat_number }} {% if seat.is_booked %}(booked){% endif %}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
+<form method="post" class="row g-3 mb-4">
+  {% csrf_token %}
+  <div class="col-auto">
+    <label for="seat_number" class="form-label">Seat Number</label>
+    <input type="text" id="seat_number" name="seat_number" class="form-control" placeholder="e.g. A1" required>
+  </div>
+  <div class="col-auto">
+    <label for="user" class="form-label">Your Name</label>
+    <input type="text" id="user" name="user" class="form-control" placeholder="e.g. Alice" required>
+  </div>
+  <div class="col-auto align-self-end">
+    <button type="submit" class="btn btn-primary">Book</button>
+  </div>
+</form>
 
-    <div class="mb-3">
-      <label class="form-label" for="user">Your name</label>
-      <input id="user" name="user" class="form-control" placeholder="e.g. Alice" required>
-    </div>
-
-    <button class="btn btn-primary">Book Seat</button>
-  </form>
+<h5>Available Seats</h5>
+<table class="table table-sm">
+  <thead><tr><th>Seat</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for seat in seats %}
+    <tr>
+      <td>{{ seat.seat_number }}</td>
+      <td>
+        {% if seat.is_booked %}
+          <span class="badge text-bg-secondary">Booked</span>
+        {% else %}
+          <span class="badge text-bg-success">Available</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="2">No seats yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
+

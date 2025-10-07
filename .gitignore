@@ -18,3 +18,6 @@ ENV/
 
 # HW2 venv
 homework2/myenv/
+
+# HW2 collected static
+homework2/staticfiles/
