@@ -52,6 +52,9 @@ Create a Blueprint from this repo (or manual web service)
 
 Env vars: DATABASE_URL (from Render Postgres), SECRET_KEY (generate), WEB_CONCURRENCY=4
 
+# Render URL:
+https://movie-theater-booking-ksz6.onrender.com 
+
 ## GitHub:
 https://github.com/RafaelRoj8/cs5300/commits/main/homework2
 
